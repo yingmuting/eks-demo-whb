@@ -1,0 +1,45 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: testipv63
+  version: "1.22"
+  region: us-east-1
+
+vpc:
+    id: vpc-0f7ba5ff584440bcd
+    securityGroup: sg-08ade32ee97bbfa71
+    subnets:
+      public:
+        public-1a:
+            id: subnet-068a1a5f81cb6426b
+        public-1b:
+            id: subnet-0b48430929e725d35
+      private:
+        private-nat1:
+            id: subnet-043ecf1e7dff2ee7f
+        private-nat2:
+            id: subnet-0de5bf410c47a776b
+
+managedNodeGroups:
+#nodeGroups:
+  - name: x86-al2-on-demand-xl
+    ami: ami-06ce408c7d97c5f2d
+#    instanceType: m6a.xlarge
+    instanceTypes: [ "m6i.xlarge", "m6a.xlarge" ]
+    minSize: 2
+    desiredCapacity: 2
+    maxSize: 4
+    volumeSize: 30
+    volumeType: gp3
+    volumeEncrypted: true
+    ssh:
+      allow: true
+      publicKeyName: us-east-1
+    updateConfig:
+      maxUnavailablePercentage: 33
+    overrideBootstrapCommand: |
+      #!/bin/bash
+      /etc/eks/bootstrap.sh testipv63  --kubelet-extra-args '--max-pods=110 --system-reserved=cpu=200m,memory=200Mi,ephemeral-storage=1Gi --kube-reserved=cpu=200m,memory=200Mi,ephemeral-storage=1Gi --kube-reserved-cgroup=/kube-reserved --eviction-hard=memory.available<100Mi,nodefs.available<10% --feature-gates=RotateKubeletServerCertificate=true' --ip-family ipv6 --service-ipv6-cidr fd84:a8bf:e590::/108 --use-max-pods false
+    labels:
+      os-distribution: amazon-linux-2

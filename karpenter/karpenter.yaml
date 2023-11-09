@@ -1,0 +1,66 @@
+apiVersion: karpenter.sh/v1alpha5
+kind: Provisioner
+metadata:
+  name: default
+spec:
+  labels:
+    intent: apps
+  requirements:
+    - key: karpenter.sh/capacity-type
+      operator: In
+      values: ["spot", "on-demand"]
+  ttlSecondsAfterEmpty: 60
+  ttlSecondsUntilExpired: 1296000
+  providerRef:
+    name: default
+---
+apiVersion: karpenter.k8s.aws/v1alpha1
+kind: AWSNodeTemplate
+metadata:
+  name: default
+spec:
+  subnetSelector:
+    aws-ids: "subnet-077e3f24a51f979bf,subnet-0ddd33536fdafc3e9,subnet-035431c9e1dc18b5f,subnet-00fb60158e4ae9594"
+  securityGroupSelector:
+    aws-ids: "sg-04748bd94e6195921,sg-02ca123d0b291cc96"
+  amiFamily: Custom # 自定义AMI
+  amiSelector:
+    aws-ids: ami-0bd3c2e379f7f09c9 # 指定 AMI ID
+  userData: |
+    MIME-Version: 1.0
+    Content-Type: multipart/mixed; boundary="BOUNDARY"
+    
+    --BOUNDARY
+    Content-Type: text/x-shellscript; charset="us-ascii"
+    
+    #!/bin/bash
+    echo "Running my custom set-up"
+    
+    /etc/eks/bootstrap.sh whb-karpenter-demo  --kubelet-extra-args '--system-reserved=cpu=100m,memory=500Mi,ephemeral-storage=1Gi --kube-reserved=cpu=100m,memory=500Mi,ephemeral-storage=1Gi --kube-reserved-cgroup=/kube-reserved --eviction-hard=memory.available<100Mi,nodefs.available<10% --feature-gates=RotateKubeletServerCertificate=true'    
+
+    --BOUNDARY--
+
+#---
+#apiVersion: karpenter.k8s.aws/v1alpha1
+#kind: AWSNodeTemplate
+#metadata:
+#  name: br
+#spec:
+#  subnetSelector:
+#    aws-ids: "subnet-077e3f24a51f979bf,subnet-0ddd33536fdafc3e9,subnet-035431c9e1dc18b5f,subnet-00fb60158e4ae9594"
+#  securityGroupSelector:
+#    aws-ids: "sg-04748bd94e6195921,sg-02ca123d0b291cc96"
+#  amiFamily: Bottlerocket
+#  userData:  |
+#    [settings.kubernetes.kube-reserved]
+#    cpu = "200m"
+#    memory = "200Mi"
+#    ephemeral-storage= "1Gi"
+#
+#    [settings.kubernetes.system-reserved]
+#    cpu = "200m"
+#    memory = "200Mi"
+#    ephemeral-storage= "1Gi"
+#
+#    [settings.kubernetes.eviction-hard]
+#    "memory.available" = "15%"

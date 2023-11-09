@@ -1,0 +1,22 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+ 
+metadata:
+  name: whb-karpenter-demo
+  region: us-east-1 
+ 
+nodeGroups:
+  - name: new-unmanaged-nodegroup
+    amiFamily: AmazonLinux2
+    instanceType: c5.xlarge
+    desiredCapacity: 1 
+    minSize: 1
+    maxSize: 2
+    volumeSize: 80 
+    volumeType: gp3
+    iam:
+#      instanceRoleARN: arn:aws:iam::952972464070:role/eksctl-whb-karpenter-demo-nodegro-NodeInstanceRole-CCEXYTQSUAYA
+      instanceRoleARN: arn:aws:iam::952972464070:role/AmazonEKSNodeRole
+    subnets:
+      - subnet-00200ddcd5981b478
+      - subnet-0d052e94ee892f5e4

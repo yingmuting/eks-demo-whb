@@ -1,0 +1,29 @@
+apiVersion: karpenter.sh/v1alpha5
+kind: Provisioner
+metadata:
+  name: default
+spec:
+  labels:
+    intent: apps
+  requirements:
+    - key: karpenter.sh/capacity-type
+      operator: In
+      values: ["spot","on-demand"]
+    - key: karpenter.k8s.aws/instance-size
+      operator: In
+      values: ["large","xlarge"]
+  ttlSecondsAfterEmpty: 120
+  ttlSecondsUntilExpired: 604800
+  providerRef:
+    name: default
+---
+apiVersion: karpenter.k8s.aws/v1alpha1
+kind: AWSNodeTemplate
+metadata:
+  name: default
+spec:
+  subnetSelector:
+#    aws-ids: "subnet-00d75e77a4071b2c8,subnet-059e711b8265e8816" # private subnet
+    aws-ids: "subnet-0879dc9b2b82be654" # test add new subnet in vpc
+  securityGroupSelector:
+    aws-ids: "sg-031de27da4a5dbc39,sg-063beddb20bc732a7"

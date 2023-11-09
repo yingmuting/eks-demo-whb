@@ -1,0 +1,52 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: test16
+  version: "1.22"
+  region: us-east-1
+
+vpc:
+    id: vpc-0161c87d9c9140f7a
+    securityGroup: sg-0c5a996786abafc92
+    subnets:
+      public:
+        public-1c:
+            id: subnet-0d41f5efa713e39c3
+        public-1b:
+            id: subnet-095423a8b50891ddf
+      private:
+        private-nat1:
+            id: subnet-08ab0791bea4fe039
+        private-nat2:
+            id: subnet-099d1bdb66a11baa8
+
+managedNodeGroups:
+  - name: x86-br-ami
+#    ami: ami-04958b57e72e69fb0
+    amiFamily: Bottlerocket
+    instanceTypes: [ "m6i.xlarge", "m6a.xlarge" ]
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 2
+    volumeSize: 30
+    volumeType: gp3
+    volumeEncrypted: true
+    ssh:
+      allow: true
+      publicKeyName: us-east-1
+    updateConfig:
+      maxUnavailablePercentage: 33
+    bottlerocket:
+      settings:
+        kubernetes:
+          kube-reserved:
+            cpu: "100m"
+            memory: "500Mi"
+            ephemeral-storage: "1Gi"
+          system-reserved:
+            cpu: "100m"
+            memory: "500Mi"
+            ephemeral-storage: "1Gi"
+          eviction-hard:
+            "memory.available": "15%"

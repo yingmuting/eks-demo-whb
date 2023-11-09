@@ -1,0 +1,18 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: my-tgb-nlb-ip
+  namespace: fftest
+spec:
+  serviceRef:
+    name: nginx-tgb-svc-ip # srvice name
+    port: 80 # service port
+  targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:952972464070:targetgroup/testtgb/dfcd8b745a63db69
+  networking:
+    ingress:
+    - from:
+      - ipBlock:
+          cidr: 192.168.0.0/16 
+      ports:
+      - protocol: TCP
+#        port: 80

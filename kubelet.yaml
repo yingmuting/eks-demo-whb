@@ -1,0 +1,27 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: test16
+  region: us-east-1
+
+nodeGroups:
+  - name: ng-reserved
+    instanceType: m5a.xlarge
+    desiredCapacity: 1
+    kubeletExtraConfig:
+        kubeReserved:
+            cpu: "300m"
+            memory: "300Mi"
+            ephemeral-storage: "1Gi"
+        kubeReservedCgroup: "/kube-reserved"
+        systemReserved:
+            cpu: "300m"
+            memory: "300Mi"
+            ephemeral-storage: "1Gi"
+        evictionHard:
+            memory.available:  "200Mi"
+            nodefs.available: "10%"
+        featureGates:
+            RotateKubeletServerCertificate: true # has to be enabled, otherwise it will be disabled
+

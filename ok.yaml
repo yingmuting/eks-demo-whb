@@ -1,0 +1,56 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: okkong-k8s
+  version: "1.22"
+  region: us-east-1
+
+vpc:
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true
+  id: vpc-0f7ba5ff584440bcd
+  subnets:
+    public:
+      public-1a:
+          id: subnet-068a1a5f81cb6426b
+      public-1b:
+          id: subnet-0b48430929e725d35
+    private:
+      private-nat1:
+          id: subnet-043ecf1e7dff2ee7f
+      private-nat2:
+          id: subnet-0de5bf410c47a776b
+iam:
+  withOIDC: true
+
+addons:
+  - name: vpc-cni
+    version: latest
+  - name: coredns
+    version: latest
+  - name: kube-proxy
+    version: latest
+
+managedNodeGroups:
+  - name: okkong-k8s
+    amiFamily: AmazonLinux2
+    instanceTypes: [ "c5.2xlarge" ]
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 2
+    volumeSize: 20
+    volumeType: gp3
+    volumeEncrypted: true
+    ssh:
+      allow: true
+      publicKeyName: us-east-1
+    updateConfig:
+      maxUnavailablePercentage: 50
+    labels:
+      os-distribution: amazon-linux-2
+    privateNetworking: true
+    subnets:
+      - private-nat1
+

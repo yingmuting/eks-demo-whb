@@ -1,0 +1,40 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: test
+  version: "1.22"
+  region: us-east-1
+
+vpc:
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true
+
+iam:
+  withOIDC: true
+
+addons:
+  - name: vpc-cni
+    version: latest
+  - name: coredns
+    version: latest
+  - name: kube-proxy
+    version: latest
+
+managedNodeGroups:
+  - name: x86-al2-spot-2
+    spot: true
+    amiFamily: AmazonLinux2
+    instanceTypes: [ "t2.large","t3.large","m4.large","m5.large","m5a.large","m6i.large", "m6a.large" ]
+    minSize: 1
+    desiredCapacity: 2
+    maxSize: 3
+    volumeSize: 30
+    volumeType: gp3
+    volumeEncrypted: true
+    ssh:
+      allow: true
+      publicKeyName: us-east-1
+    updateConfig:
+      maxUnavailablePercentage: 33

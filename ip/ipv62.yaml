@@ -1,0 +1,11 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: testipv6
+  region: us-east-1
+managedNodeGroups:
+  - name: my-nodegroup
+    ami: ami-0cca3d8b6715c9f74
+    overrideBootstrapCommand: |
+      #!/bin/bash
+      /etc/eks/bootstrap.sh testipv6 --kubelet-extra-args '--system-reserved=memory=1Gi --kube-reserved=memory=1Gi'
